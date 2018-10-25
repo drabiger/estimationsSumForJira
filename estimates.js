@@ -7,7 +7,11 @@ var handleCard = function(card) {
 		// Jira: cloud
 		spanWithEstimate = $(card).find("aui-badge.ghx-estimate");
 		if(!spanWithEstimate || spanWithEstimate.length == 0) {
-			return NaN;
+			// Jira version 7.11.0 does not set the class
+			spanWithEstimate = $(card).find("aui-badge");
+			if(!spanWithEstimate || spanWithEstimate.length == 0) {
+				return NaN;
+			}
 		}
 	}
 
@@ -52,12 +56,13 @@ var handleColumn = function(column, columnIdx, sumPerColumn) {
 		sumPerColumn[columnIdx] = 0;
 	}
 	if(typeof sumForThisColumnn != "undefined" && !isNaN(sumForThisColumnn)) {
-		sumPerColumn[columnIdx] += Math.round((sumForThisColumnn/8) * 10) / 10;
+		sumPerColumn[columnIdx] += sumForThisColumnn/8;
 	}
 };
 
 
  setInterval(function() {
+ 	console.log("starting ESTIMATES");
 	var sumPerColumn = [];
 
 	var swimlanes = $("#ghx-pool .ghx-swimlane");
@@ -79,7 +84,7 @@ var handleColumn = function(column, columnIdx, sumPerColumn) {
 		if(divQty.length == 0) {
 			if(typeof sumPerColumn[columnIdx] != "undefined") {
 				console.log("Setting header #" + columnIdx + " to: " + sumPerColumn[columnIdx]);
-				$(this).append("<span class='sumcount label label-default'>" + sumPerColumn[columnIdx] + "d</span>");
+				$(this).append("<span class='sumcount label label-default'>" + (Math.round(sumPerColumn[columnIdx]*10)/10) + "d</span>");
 			}
 		}
 		++columnIdx;
