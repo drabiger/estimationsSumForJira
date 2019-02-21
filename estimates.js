@@ -10,7 +10,12 @@ var handleCard = function(card) {
 			// Jira version 7.11.0 does not set the class
 			spanWithEstimate = $(card).find("aui-badge");
 			if(!spanWithEstimate || spanWithEstimate.length == 0) {
-				return NaN;
+				// Jira version 7.11.0 KANBAN boards do not tell remaining days in a structured way
+				// this is a good guess how to get it, but obviously not reliable
+				var spanWithEstimate = $(card).find('[data-tooltip~="Remaining"]').children(".ghx-extra-field-content");
+				if(!spanWithEstimate || spanWithEstimate.length == 0) {
+					return NaN;
+				}
 			}
 		}
 	}
@@ -62,7 +67,6 @@ var handleColumn = function(column, columnIdx, sumPerColumn) {
 
 
  setInterval(function() {
- 	console.log("starting ESTIMATES");
 	var sumPerColumn = [];
 
 	var swimlanes = $("#ghx-pool .ghx-swimlane");
