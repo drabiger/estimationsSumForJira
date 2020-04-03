@@ -48,23 +48,17 @@ var handleColumn = function(column, columnIdx, sumPerColumn, noPerColumn) {
 
 	var cards = $(column).find(".ghx-issue");
 	var hasSumChangedForColumn = false;
-	var sumForThisColumnn = 0;
+	sumPerColumn[columnIdx] = 0;
 	noPerColumn[columnIdx] = 0;
 	
 	cards.each(function() {
 		var cardValue = handleCard(this);
 		if(typeof cardValue != "undefined" && !isNaN(cardValue)) {
-			sumForThisColumnn += parseFloat(cardValue);
+			sumPerColumn[columnIdx]+= parseFloat(cardValue)/8;
 		}
 		noPerColumn[columnIdx] += 1;
 	});
-	console.log("SUM FOR COLUMN #" + columnIdx + " is: " + (parseFloat(sumForThisColumnn)/8) + " days");
-	if(typeof sumPerColumn[columnIdx] == "undefined") {
-		sumPerColumn[columnIdx] = 0;
-	}
-	if(typeof sumForThisColumnn != "undefined" && !isNaN(sumForThisColumnn)) {
-		sumPerColumn[columnIdx] += sumForThisColumnn/8;
-	}
+	console.log("SUM FOR COLUMN #" + columnIdx + " is: " + sumPerColumn[columnIdx] + " days");
 	
 };
 
