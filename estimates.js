@@ -43,31 +43,29 @@ var handleCard = function(card) {
 	}
 };
 
-var handleColumn = function(column, columnIdx, sumPerColumn) {
+var handleColumn = function(column, columnIdx, sumPerColumn, noPerColumn) {
 	console.log("new column, id=" + $(column).data("column-id"));
 
 	var cards = $(column).find(".ghx-issue");
 	var hasSumChangedForColumn = false;
-	var sumForThisColumnn = 0;
-
+	sumPerColumn[columnIdx] = 0;
+	noPerColumn[columnIdx] = 0;
+	
 	cards.each(function() {
 		var cardValue = handleCard(this);
 		if(typeof cardValue != "undefined" && !isNaN(cardValue)) {
-			sumForThisColumnn += parseFloat(cardValue);
+			sumPerColumn[columnIdx]+= parseFloat(cardValue)/8;
 		}
+		noPerColumn[columnIdx] += 1;
 	});
-	console.log("SUM FOR COLUMN #" + columnIdx + " is: " + (parseFloat(sumForThisColumnn)/8) + " days");
-	if(typeof sumPerColumn[columnIdx] == "undefined") {
-		sumPerColumn[columnIdx] = 0;
-	}
-	if(typeof sumForThisColumnn != "undefined" && !isNaN(sumForThisColumnn)) {
-		sumPerColumn[columnIdx] += sumForThisColumnn/8;
-	}
+	console.log("SUM FOR COLUMN #" + columnIdx + " is: " + sumPerColumn[columnIdx] + " days");
+	
 };
 
 
  setInterval(function() {
 	var sumPerColumn = [];
+	var noPerColumn = [];
 
 	var swimlanes = $("#ghx-pool .ghx-swimlane");
     swimlanes.each(function() {
@@ -75,7 +73,7 @@ var handleColumn = function(column, columnIdx, sumPerColumn) {
 		var columns = $(this).find(".ghx-columns .ghx-column");
 		var columnIdx = 0;
 		columns.each(function() {
-			handleColumn(this, columnIdx, sumPerColumn);
+			handleColumn(this, columnIdx, sumPerColumn, noPerColumn);
 			++columnIdx;
 		});
     });
@@ -88,7 +86,7 @@ var handleColumn = function(column, columnIdx, sumPerColumn) {
 		if(divQty.length == 0) {
 			if(typeof sumPerColumn[columnIdx] != "undefined") {
 				console.log("Setting header #" + columnIdx + " to: " + sumPerColumn[columnIdx]);
-				$(this).append("<span class='sumcount label label-default'>" + (Math.round(sumPerColumn[columnIdx]*10)/10) + "d</span>");
+				$(this).append("<span class='sumcount label label-default'>" + (Math.round(sumPerColumn[columnIdx]*10)/10) + "d (" + noPerColumn[columnIdx] + ")</span>");
 			}
 		}
 		++columnIdx;
