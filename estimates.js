@@ -1,6 +1,8 @@
 var handleCard = function(card) {
 	console.log("new card " + $(card).data("issue-key"));
 
+	let isKanban = false;
+
 	// Jira: on-prem
 	var spanWithEstimate = $(card).find(".ghx-corner span.aui-badge");
 	if(!spanWithEstimate || spanWithEstimate.length == 0) {
@@ -16,12 +18,18 @@ var handleCard = function(card) {
 				if(!spanWithEstimate || spanWithEstimate.length == 0) {
 					return NaN;
 				}
+                isKanban = true;
 			}
 		}
 	}
 
 	var sumInHours = 0;
 	var content = $(spanWithEstimate).html();
+	if (isKanban) {
+    	if (content === "None") return 0;
+
+		content = content.replace(/\sdays?/g, 'd').replace(/\shours?/g, 'h').replace(/\sminutes?/g, 'm').replace(/,/, '');
+	}
 	if (content.length > 1) {
 		console.log("card content: " + content);
 		content.split(" ").forEach(function(item, index) {
@@ -35,6 +43,8 @@ var handleCard = function(card) {
 				case "d": sumInHours += timeValue * 8;
 				break;
 				case "h": sumInHours += timeValue;
+				break;
+				case "m": sumInHours += timeValue/60;
 				break;
 				default: console.log("Oops. Don't know how to handle time unit '" + timeUnit + "'. Please report me!");
 			}
@@ -88,6 +98,9 @@ var handleColumn = function(column, columnIdx, sumPerColumn, noPerColumn) {
 				console.log("Setting header #" + columnIdx + " to: " + sumPerColumn[columnIdx]);
 				$(this).append("<span class='sumcount label label-default'>" + (Math.round(sumPerColumn[columnIdx]*10)/10) + "d (" + noPerColumn[columnIdx] + ")</span>");
 			}
+		}
+		else {
+			$(divQty).text((Math.round(sumPerColumn[columnIdx]*10)/10) + "d");
 		}
 		++columnIdx;
 	});
